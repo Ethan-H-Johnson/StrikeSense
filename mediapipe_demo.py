@@ -4,6 +4,12 @@ import numpy as np
 import math
 import time
 
+"""
+TODO: 
+# Lock on to specific fighter/target
+"""
+
+
 # --- Configuration ---
 # IMPORTANT: Replace 'your_boxing_video.mp4' with the actual filename of your video.
 VIDEO_FILE = 'data\clips\mayweather_jab.mp4'
