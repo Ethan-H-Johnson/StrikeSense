@@ -20,7 +20,7 @@ Real-time 3D pose estimation system for MMA strike analysis. Currently focused o
 - MediaPipe Pose for accurate 3D landmark detection
 - 12 relevant joint extraction (shoulders, elbows, wrists, hips, knees)
 - CSV export for offline analysis
-- 30+ FPS performance on CPU (Intel i5)
+- 30+ FPS performance on CPU
 - Skeleton overlay visualization
 - Auto-named recording files
 
@@ -31,6 +31,17 @@ Real-time 3D pose estimation system for MMA strike analysis. Currently focused o
 - Python 3.11
 - Webcam
 - No GPU required (CPU-only)
+
+### Model Data
+
+- This project requires external model files not included in the repository due to size limits
+
+1. Obtain models_smplx_v1_1.zip from https://smpl-x.is.tue.mpg.de/index.html 
+   (Free account creation required to download models)
+
+2. Extract the directory into the project root
+
+3. Ensure the filepath resolves to ./models_smplx_v1_1
 
 ### Installation
 
@@ -125,14 +136,16 @@ StrikeSense/
 │   └── recordings/
 │       ├── videos/          # Annotated MP4 files
 │       └── keypoints/       # CSV keypoint data
-│
-├── smpl_demo.py             # Archived (SMPL experiments)
-└── pose_demo/               # Archived (legacy code)
+│         
+└── archive/                 # Archived (SMPL & Metric experiments)
+    ├── mediapipe_demo.py
+    ├── metric_demo.py
+    └── smpl_demo.py
 ```
 
 ## Performance
 
-- FPS: 30+ on Intel i5 (CPU only)
+- FPS: ~30+ on CPU
 - Keypoints: 12 joints
 - CSV size: ~10KB per second
 - Video size: ~2MB per second (MP4)
@@ -156,7 +169,7 @@ StrikeSense/
 -  Audio feedback (tone/voice)
 -  Visual feedback (color-coded joints)
 -  Score overlay
--  Training session summary
+-  Training session summary (deeper analysis)
 
 ## Technical Details
 
@@ -178,7 +191,6 @@ MediaPipe provides world coordinates with origin at hip center:
 - SMPL mesh integration was explored but removed for simplicity
 - Current focus is on keypoint extraction for analytics
 - MediaPipe chosen over YOLOv8/MMPose for 3D support and CPU performance
-- Python 3.11 required (some libraries incompatible with 3.9)
 
 ## License
-MIT
+- MIT

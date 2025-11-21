@@ -1,0 +1,5 @@
+data/*.mp4
+models_smplx_v1_1
+**/__pycache__/
+.env
+yolo11n-pose.pt
