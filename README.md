@@ -1,185 +1,184 @@
 # StrikeSense
 
-Real-time MMA strike analysis application using video processing, YOLO pose estimation, and SMPL 3D pose recovery. Provides actionable feedback for perfecting jabs and crosses.
+Real-time 3D pose estimation system for MMA strike analysis. Currently focused on Jab and Cross biomechanical analysis using MediaPipe Pose for 3D keypoint extraction.
 
-## Architecture
+## Current Status
 
-- **Client**: Next.js web application (mobile-optimized)
-- **Server**: FastAPI backend with WebSocket support
-- **Pose Estimation**: YOLOv11-Pose for 2D keypoints → SMPL for 3D pose
-- **Communication**: WebSocket for real-time, low-latency feedback
+**Phase 1: 3D Pose Estimation MVP (Complete)**
+- Real-time 3D keypoint extraction (33 landmarks)
+- CSV export for biomechanical analysis
+- Skeleton visualization overlay
+- Automated recording with timestamp synchronization
+
+**Phase 2: Classification and Grading (Planned)**
+- Jab/Cross detection and classification
+- Form grading based on biomechanical metrics
+- Real-time audio/visual feedback
 
 ## Features
 
-- Real-time video analysis from mobile camera
-- Multi-person tracking with filtering (handles crowded scenes)
-- Metrics calculation: punch angle, speed, hip rotation
-- Biomechanics-based scoring for jabs and crosses
-- LLM-powered actionable feedback
+- MediaPipe Pose for accurate 3D landmark detection
+- 12 relevant joint extraction (shoulders, elbows, wrists, hips, knees)
+- CSV export for offline analysis
+- 30+ FPS performance on CPU (Intel i5)
+- Skeleton overlay visualization
+- Auto-named recording files
 
 ## Setup
 
-### Server Setup
+### Requirements
 
-1. Navigate to server directory:
+- Python 3.11
+- Webcam
+- No GPU required (CPU-only)
+
+### Installation
+
+1. Navigate to pose estimation directory:
 ```bash
-cd server
-```
-
-2. Create virtual environment:
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
-
-3. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
-
-4. Ensure YOLO model file exists:
-   - Place `yolo11n-pose.pt` in the project root or server directory
-   - Or download it (YOLO will auto-download on first run)
-
-5. Set environment variables (create `.env` file):
-```env
-LLM_API_KEY=your_openai_api_key_here
-HOST=0.0.0.0
-PORT=8000
-DEBUG=True
-```
-
-6. Run server:
-```bash
-python main.py
-# Or: uvicorn main:app --reload
-```
-
-### Client Setup
-
-1. Navigate to client directory:
-```bash
-cd client
+cd pose_estimation
 ```
 
 2. Install dependencies:
 ```bash
-npm install
+pip install -r requirements.txt
 ```
 
-3. Set environment variables (create `.env.local`):
-```env
-NEXT_PUBLIC_WS_URL=ws://localhost:8000/ws
-```
-
-4. Run development server:
-```bash
-npm run dev
-```
-
-5. Open browser to `http://localhost:3000`
+Dependencies:
+- mediapipe
+- opencv-python
+- numpy
 
 ## Usage
 
-1. Start the server (see Server Setup)
-2. Start the client (see Client Setup)
-3. Open the web app in your browser
-4. Click "Start Camera" to enable camera access
-5. Click "Start Analysis" to begin real-time strike analysis
-6. Perform jabs and crosses - receive real-time feedback!
+### Running the Demo
+
+```bash
+cd pose_estimation
+python pose_demo.py
+```
+
+### Controls
+
+- **R**: Start/Stop recording
+- **Q**: Quit application
+
+### Recording Workflow
+
+1. Launch pose_demo.py
+2. Position yourself in frame (skeleton should appear)
+3. Press R to start recording
+4. Perform strikes (jabs, crosses)
+5. Press R to stop recording
+6. Files automatically saved to data/recordings/
+
+## Output Files
+
+### Video Files
+Location: `data/recordings/videos/`
+Format: `pose_YYYYMMDD_HHMMSS.mp4`
+- Annotated video with skeleton overlay
+- 30 FPS
+
+### Keypoint Data
+Location: `data/recordings/keypoints/`
+Format: `pose_YYYYMMDD_HHMMSS.csv`
+
+CSV Structure:
+```csv
+timestamp,frame,joint,x,y,z,visibility
+0.033,1,L_Shoulder,0.45,-0.12,0.85,0.99
+0.033,1,R_Shoulder,0.55,-0.10,0.82,0.99
+```
+
+Columns:
+- timestamp: Seconds since recording start
+- frame: Frame number
+- joint: Joint name (L_Shoulder, R_Elbow, etc.)
+- x, y, z: 3D world coordinates (origin at hips)
+- visibility: Landmark confidence (0-1)
+
+## Extracted Joints
+
+12 relevant joints for Jab/Cross analysis:
+
+| Joint | Biomechanical Relevance |
+|-------|------------------------|
+| L_Shoulder, R_Shoulder | Rotation, power generation |
+| L_Elbow, R_Elbow | Extension angle |
+| L_Wrist, R_Wrist | Fist trajectory, speed |
+| L_Hip, R_Hip | Hip rotation, weight transfer |
+| L_Knee, R_Knee | Stance stability |
+| Nose | Head movement |
+| Neck | Spine alignment |
 
 ## Project Structure
 
 ```
 StrikeSense/
-├── server/                 # FastAPI backend
-│   ├── api/                # API endpoints
-│   │   ├── websocket.py    # WebSocket handler
-│   │   └── health.py       # Health check
-│   ├── services/           # Business logic
-│   │   ├── pose_estimator.py
-│   │   ├── person_tracker.py
-│   │   ├── metrics_calculator.py
-│   │   ├── scorer.py
-│   │   └── llm_feedback.py
-│   ├── models/             # Data models
-│   ├── config.py           # Configuration
-│   └── main.py             # Entry point
+├── pose_estimation/          # Current MVP
+│   ├── pose_demo.py         # Main application
+│   ├── keypoint_logger.py   # CSV export module
+│   └── requirements.txt     # Dependencies
 │
-├── client/                 # Next.js frontend
-│   ├── app/                # Next.js app directory
-│   ├── components/         # React components
-│   └── lib/                # Utilities
+├── data/
+│   └── recordings/
+│       ├── videos/          # Annotated MP4 files
+│       └── keypoints/       # CSV keypoint data
 │
-└── data/                   # Video data files
+├── smpl_demo.py             # Archived (SMPL experiments)
+└── pose_demo/               # Archived (legacy code)
 ```
 
-## Configuration
+## Performance
 
-### Server Configuration
+- FPS: 30+ on Intel i5 (CPU only)
+- Keypoints: 12 joints
+- CSV size: ~10KB per second
+- Video size: ~2MB per second (MP4)
+- Coordinate system: MediaPipe world coords (origin at hips)
 
-Edit `server/config.py` or set environment variables:
+## Development Roadmap
 
-- `YOLO_MODEL_PATH`: Path to YOLO model file
-- `SMPL_MODEL_PATH`: Path to SMPL model files (for future use)
-- `LLM_API_KEY`: OpenAI API key for feedback generation
-- `MAX_CONCURRENT_SESSIONS`: Maximum concurrent analysis sessions
-- `FRAME_SKIP_RATE`: Process every Nth frame (performance tuning)
+### Phase 1: 3D Pose Estimation (Complete)
+-  MediaPipe integration
+-  Real-time skeleton visualization
+-  CSV keypoint export
+-  Automated file naming
 
-### Biomechanics Settings
+### Phase 2: Strike Analysis (In Progress)
+-  Jab detection algorithm
+-  Cross detection algorithm
+-  Biomechanical metrics calculation
+-  Form grading system
 
-Target values (from research):
-- `TARGET_ELBOW_ANGLE`: 175.0° (perfect extension)
-- `PERFECT_RANGE`: ±5° for 10/10 score
-- `EXTENSION_ANGLE`: 160° (minimum for punch detection)
+### Phase 3: Real-time Feedback (Planned)
+-  Audio feedback (tone/voice)
+-  Visual feedback (color-coded joints)
+-  Score overlay
+-  Training session summary
 
-## Development
+## Technical Details
 
-### Adding SMPL Support
+### Coordinate System
+MediaPipe provides world coordinates with origin at hip center:
+- X-axis: Right (positive) / Left (negative)
+- Y-axis: Up (positive) / Down (negative)
+- Z-axis: Forward (positive) / Backward (negative)
 
-1. Install SMPL library:
-```bash
-pip install smplx
-```
-
-2. Download SMPL model files
-3. Update `server/services/pose_estimator.py` to use SMPL
-4. Update `server/services/smpl_service.py` with implementation
-
-### Testing
-
-Server health check:
-```bash
-curl http://localhost:8000/api/health
-```
-
-## Deployment
-
-### AWS Deployment
-
-1. Create EC2 instance
-2. Install dependencies
-3. Set up environment variables
-4. Run with production WSGI server:
-```bash
-uvicorn main:app --host 0.0.0.0 --port 8000
-```
-
-### Client Deployment
-
-Deploy to Vercel, Netlify, or similar:
-```bash
-cd client
-npm run build
-```
+### Pose Estimation
+- Model: MediaPipe Pose (BlazePose GHUM)
+- Complexity: 1 (balanced speed/accuracy)
+- Landmarks: 33 total (12 exported)
+- Detection confidence: 0.5
+- Tracking confidence: 0.5
 
 ## Notes
 
-- SMPL integration is currently a placeholder - implement when ready
-- Person tracking uses heuristics to filter out audience/refs
-- LLM feedback falls back to rule-based if API key not set
-- Frame skipping can be adjusted for performance vs. accuracy tradeoff
+- SMPL mesh integration was explored but removed for simplicity
+- Current focus is on keypoint extraction for analytics
+- MediaPipe chosen over YOLOv8/MMPose for 3D support and CPU performance
+- Python 3.11 required (some libraries incompatible with 3.9)
 
 ## License
-
 MIT

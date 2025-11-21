@@ -1,8 +1,0 @@
-data/clips/*.mp4
-data/jab_data.mp4
-data/mayweather_jab.mp4
-output/analysis_report.json
-yolo11n-pose.pt
-cursor_test/*
-smpl_models/*
-__pycache__/*
