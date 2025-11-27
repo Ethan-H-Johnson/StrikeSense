@@ -10,19 +10,28 @@ Real-time 3D pose estimation system for MMA strike analysis. Currently focused o
 - Skeleton visualization overlay
 - Automated recording with timestamp synchronization
 
-**Phase 2: Classification and Grading (Planned)**
-- Jab/Cross detection and classification
+**Phase 2: Strike Analysis (Complete)**
+- Real-time Jab/Cross detection and classification
+- Audio feedback (distinct tones for each strike)
+- Hybrid Stance Detection (Knees/Shoulders)
+- UI Toggles for detection and fullscreen
+
+**Phase 3: Grading and Feedback (Planned)**
 - Form grading based on biomechanical metrics
-- Real-time audio/visual feedback
+- Visual feedback (color-coded joints)
+- Training session summary
 
 ## Features
 
 - MediaPipe Pose for accurate 3D landmark detection
 - 12 relevant joint extraction (shoulders, elbows, wrists, hips, knees)
+- Real-time Strike Detection (Jab vs Cross)
+- Audio Feedback (High/Low beeps)
 - CSV export for offline analysis
 - 30+ FPS performance on CPU
 - Skeleton overlay visualization
 - Auto-named recording files
+- Resizable window with Fullscreen toggle
 
 ## Setup
 
@@ -31,17 +40,6 @@ Real-time 3D pose estimation system for MMA strike analysis. Currently focused o
 - Python 3.11
 - Webcam
 - No GPU required (CPU-only)
-
-### Model Data
-
-- This project requires external model files not included in the repository due to size limits
-
-1. Obtain models_smplx_v1_1.zip from https://smpl-x.is.tue.mpg.de/index.html 
-   (Free account creation required to download models)
-
-2. Extract the directory into the project root
-
-3. Ensure the filepath resolves to ./models_smplx_v1_1
 
 ### Installation
 
@@ -72,16 +70,19 @@ python pose_demo.py
 ### Controls
 
 - **R**: Start/Stop recording
+- **S**: Toggle Strike Detection (ON/OFF)
+- **F**: Toggle Fullscreen
 - **Q**: Quit application
 
 ### Recording Workflow
 
 1. Launch pose_demo.py
 2. Position yourself in frame (skeleton should appear)
-3. Press R to start recording
-4. Perform strikes (jabs, crosses)
-5. Press R to stop recording
-6. Files automatically saved to data/recordings/
+3. Press S to enable strike detection (optional)
+4. Press R to start recording
+5. Perform strikes (jabs, crosses)
+6. Press R to stop recording
+7. Files automatically saved to data/recordings/
 
 ## Output Files
 
@@ -129,6 +130,8 @@ Columns:
 StrikeSense/
 ├── pose_estimation/          # Current MVP
 │   ├── pose_demo.py         # Main application
+│   ├── strike_detector.py   # Strike logic & Stance detection
+│   ├── audio_feedback.py    # Audio feedback module
 │   ├── keypoint_logger.py   # CSV export module
 │   └── requirements.txt     # Dependencies
 │
@@ -159,14 +162,15 @@ StrikeSense/
 -  CSV keypoint export
 -  Automated file naming
 
-### Phase 2: Strike Analysis (In Progress)
+### Phase 2: Strike Analysis (Complete)
 -  Jab detection algorithm
 -  Cross detection algorithm
--  Biomechanical metrics calculation
--  Form grading system
+-  Audio feedback system
+-  Hybrid Stance Detection
+-  UI Controls (Toggle, Fullscreen)
 
 ### Phase 3: Real-time Feedback (Planned)
--  Audio feedback (tone/voice)
+-  Form grading system
 -  Visual feedback (color-coded joints)
 -  Score overlay
 -  Training session summary (deeper analysis)

@@ -11,6 +11,8 @@ import sys
 # Add pose_estimation to path
 sys.path.insert(0, str(Path(__file__).parent))
 from keypoint_logger import KeypointLogger
+from strike_detector import StrikeDetector
+from audio_feedback import AudioFeedback
 
 class PoseEstimator:
     """MediaPipe 3D pose estimation"""
@@ -53,8 +55,10 @@ def main():
     print("StrikeSense Pose Estimation")
     print("="*50)
     
-    # Initialize pose estimator
+    # Initialize components
     pose_estimator = PoseEstimator(model_complexity=1)
+    strike_detector = StrikeDetector()
+    audio_feedback = AudioFeedback()
     
     # Open webcam
     cap = cv2.VideoCapture(0)
@@ -74,8 +78,19 @@ def main():
     frame_idx = 0
     start_time = None
     
+    # UI State
+    last_strike = ""
+    last_strike_time = 0
+    current_stance = "orthodox"
+    strike_detection_active = True
+    
+    # Create Resizable Window
+    cv2.namedWindow("StrikeSense - Pose Estimation", cv2.WINDOW_NORMAL)
+    
     print("\n[CONTROLS]")
     print("  R - Start/Stop Recording")
+    print("  F - Toggle Fullscreen")
+    print("  S - Toggle Strike Detection")
     print("  Q - Quit")
     print("\n[READY] Press 'R' to start recording\n")
 
@@ -88,6 +103,22 @@ def main():
         # Process pose
         landmarks_2d, landmarks_3d = pose_estimator.process_frame(frame)
         
+        # Strike Detection
+        if landmarks_3d:
+            timestamp = time.time()
+            strike, stance = strike_detector.process(landmarks_3d, timestamp)
+            current_stance = stance
+            
+            if strike_detection_active and strike:
+                last_strike = strike.upper()
+                last_strike_time = time.time()
+                print(f"[STRIKE] {last_strike} detected!")
+                
+                if strike == 'jab':
+                    audio_feedback.play_jab()
+                elif strike == 'cross':
+                    audio_feedback.play_cross()
+        
         # Draw skeleton
         display_frame = frame.copy()
         display_frame = pose_estimator.draw_skeleton(display_frame, landmarks_2d)
@@ -97,11 +128,11 @@ def main():
             if start_time is None:
                 start_time = time.time()
             
-            timestamp = time.time() - start_time
+            rec_timestamp = time.time() - start_time
             
             # Log keypoints
             if logger and landmarks_3d:
-                logger.log_frame(timestamp, frame_idx, landmarks_3d)
+                logger.log_frame(rec_timestamp, frame_idx, landmarks_3d)
             
             # Write video
             if video_writer:
@@ -109,8 +140,26 @@ def main():
         
         # UI Overlay
         fps = 1.0 / (time.time() - frame_start + 1e-6)
+        
+        # FPS
         cv2.putText(display_frame, f"FPS: {fps:.1f}", (10, 30),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+        
+        # Stance
+        cv2.putText(display_frame, f"Stance: {current_stance.upper()}", (10, 60),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 200, 0), 2)
+
+        # Detection Status
+        status_color = (0, 255, 0) if strike_detection_active else (0, 0, 255)
+        status_text = "DETECTION: ON" if strike_detection_active else "DETECTION: OFF"
+        cv2.putText(display_frame, status_text, (10, 90),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, status_color, 2)
+        
+        # Strike Indicator (Fade out after 1s)
+        if time.time() - last_strike_time < 1.0:
+            color = (0, 255, 255) if last_strike == 'JAB' else (0, 0, 255)
+            cv2.putText(display_frame, f"{last_strike}!", (width//2 - 50, height//2),
+                        cv2.FONT_HERSHEY_SIMPLEX, 2.0, color, 4)
         
         if recording:
             cv2.circle(display_frame, (width - 30, 30), 10, (0, 0, 255), -1)
@@ -125,6 +174,19 @@ def main():
         if key == ord('q'):
             break
         
+        elif key == ord('f'):
+            # Toggle Fullscreen
+            prop = cv2.getWindowProperty("StrikeSense - Pose Estimation", cv2.WND_PROP_FULLSCREEN)
+            if prop == cv2.WINDOW_FULLSCREEN:
+                cv2.setWindowProperty("StrikeSense - Pose Estimation", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_NORMAL)
+            else:
+                cv2.setWindowProperty("StrikeSense - Pose Estimation", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
+        
+        elif key == ord('s'):
+            strike_detection_active = not strike_detection_active
+            state = "ON" if strike_detection_active else "OFF"
+            print(f"[UI] Strike Detection: {state}")
+
         elif key == ord('r'):
             recording = not recording
             
