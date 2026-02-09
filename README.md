@@ -2,25 +2,6 @@
 
 Real-time 3D pose estimation system for MMA strike analysis. Currently focused on Jab and Cross biomechanical analysis using MediaPipe Pose for 3D keypoint extraction.
 
-## Current Status
-
-**Phase 1: 3D Pose Estimation MVP (Complete)**
-- Real-time 3D keypoint extraction (33 landmarks)
-- CSV export for biomechanical analysis
-- Skeleton visualization overlay
-- Automated recording with timestamp synchronization
-
-**Phase 2: Strike Analysis (Complete)**
-- Real-time Jab/Cross detection and classification
-- Audio feedback (distinct tones for each strike)
-- Hybrid Stance Detection (Knees/Shoulders)
-- UI Toggles for detection and fullscreen
-
-**Phase 3: Grading and Feedback (Planned)**
-- Form grading based on biomechanical metrics
-- Visual feedback (color-coded joints)
-- Training session summary
-
 ## Features
 
 - MediaPipe Pose for accurate 3D landmark detection
@@ -39,7 +20,6 @@ Real-time 3D pose estimation system for MMA strike analysis. Currently focused o
 
 - Python 3.11
 - Webcam
-- No GPU required (CPU-only)
 
 ### Installation
 
@@ -146,35 +126,6 @@ StrikeSense/
     └── smpl_demo.py
 ```
 
-## Performance
-
-- FPS: ~30+ on CPU
-- Keypoints: 12 joints
-- CSV size: ~10KB per second
-- Video size: ~2MB per second (MP4)
-- Coordinate system: MediaPipe world coords (origin at hips)
-
-## Development Roadmap
-
-### Phase 1: 3D Pose Estimation (Complete)
--  MediaPipe integration
--  Real-time skeleton visualization
--  CSV keypoint export
--  Automated file naming
-
-### Phase 2: Strike Analysis (Complete)
--  Jab detection algorithm
--  Cross detection algorithm
--  Audio feedback system
--  Hybrid Stance Detection
--  UI Controls (Toggle, Fullscreen)
-
-### Phase 3: Real-time Feedback (Planned)
--  Form grading system
--  Visual feedback (color-coded joints)
--  Score overlay
--  Training session summary (deeper analysis)
-
 ## Technical Details
 
 ### Coordinate System
@@ -187,14 +138,12 @@ MediaPipe provides world coordinates with origin at hip center:
 - Model: MediaPipe Pose (BlazePose GHUM)
 - Complexity: 1 (balanced speed/accuracy)
 - Landmarks: 33 total (12 exported)
-- Detection confidence: 0.5
-- Tracking confidence: 0.5
 
 ## Notes
 
 - SMPL mesh integration was explored but removed for simplicity
 - Current focus is on keypoint extraction for analytics
-- MediaPipe chosen over YOLOv8/MMPose for 3D support and CPU performance
+- MediaPipe chosen over YOLOv8/MMPose for 3D support
 
 ## License
 - MIT

@@ -1,4 +1,5 @@
-data/*.mp4
+data/videos/*.mp4
+data/videos/*.csv
 models_smplx_v1_1
 **/__pycache__/
 .env
