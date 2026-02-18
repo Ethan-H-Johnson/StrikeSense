@@ -1,0 +1,29 @@
+model:
+  model_complexity: 1
+  min_detection_confidence: 0.5
+  min_tracking_confidence: 0.5
+  static_image_mode: false
+
+landmarks:
+  relevant_joints:
+    0: Nose
+    11: L_Shoulder
+    12: R_Shoulder
+    13: L_Elbow
+    14: R_Elbow
+    15: L_Wrist
+    16: R_Wrist
+    23: L_Hip
+    24: R_Hip
+    25: L_Knee
+    26: R_Knee
+
+recording:
+  fps_target: 30
+  video_codec: "mp4v"
+  save_video: true
+  save_keypoints: true
+
+data:
+  session_format: "session_%Y%m%d_%H%M%S"
+  include_metadata: true

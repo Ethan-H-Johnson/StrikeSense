@@ -1,82 +1,92 @@
 """
-KeypointLogger - CSV export for 3D pose keypoints
+KeypointLogger - Session-based CSV export for 3D pose keypoints
+Phase 0 Refactored Version (Config Driven)
 """
+
 import csv
-from datetime import datetime
 from pathlib import Path
 
-# Joint indices for Jab/Cross analysis (MediaPipe Pose)
-RELEVANT_JOINTS = {
-    0: 'Nose',
-    11: 'L_Shoulder',
-    12: 'R_Shoulder',
-    13: 'L_Elbow',
-    14: 'R_Elbow',
-    15: 'L_Wrist',
-    16: 'R_Wrist',
-    23: 'L_Hip',
-    24: 'R_Hip',
-    25: 'L_Knee',
-    26: 'R_Knee',
-    12: 'Neck'  # Approximation (spine alignment)
-}
 
 class KeypointLogger:
-    """Logs 3D keypoints to CSV for biomechanical analysis"""
-    
-    def __init__(self, output_dir='data/recordings/keypoints'):
+    """
+    Logs 3D keypoints to CSV for biomechanical analysis.
+
+    Writes to:
+        session_dir/keypoints.csv
+    """
+
+    def __init__(self, session_dir: Path, config: dict):
         """
-        Initialize logger with auto-generated filename
-        
         Args:
-            output_dir: Directory to save CSV files
+            session_dir: Path to active recording session folder
+            config: Loaded pose.yaml configuration
         """
-        self.output_dir = Path(output_dir)
-        self.output_dir.mkdir(parents=True, exist_ok=True)
-        
-        # Generate filename: pose_YYYYMMDD_HHMMSS.csv
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        self.filepath = self.output_dir / f"pose_{timestamp}.csv"
-        
+
+        self.session_dir = Path(session_dir)
+        self.config = config
+
+        self.filepath = self.session_dir / "keypoints.csv"
+
+        # Pull joint subset from config
+        self.relevant_joints = config["landmarks"]["relevant_joints"]
+
         # Open CSV file
-        self.file = open(self.filepath, 'w', newline='')
+        self.file = open(self.filepath, "w", newline="")
         self.writer = csv.writer(self.file)
-        
+
         # Write header
         self.writer.writerow([
-            'timestamp', 'frame', 'joint', 'x', 'y', 'z', 'visibility'
+            "timestamp",
+            "frame",
+            "joint",
+            "x",
+            "y",
+            "z",
+            "visibility"
         ])
-        
+
+        self.file.flush()
+
         print(f"[LOGGER] Writing keypoints to: {self.filepath}")
-    
+
+    # ------------------------------------------------------------------
+
     def log_frame(self, timestamp, frame_num, world_landmarks):
         """
-        Log all relevant joints for a single frame
-        
+        Log all relevant joints for a single frame.
+
         Args:
             timestamp: Seconds since recording start
-            frame_num: Frame number
+            frame_num: Frame index
             world_landmarks: MediaPipe world landmarks
         """
+
         if world_landmarks is None:
             return
-        
-        # Extract only relevant joints
-        for idx, joint_name in RELEVANT_JOINTS.items():
+
+        for idx_str, joint_name in self.relevant_joints.items():
+            idx = int(idx_str)  # YAML keys load as strings
+
             if idx < len(world_landmarks.landmark):
                 lm = world_landmarks.landmark[idx]
+
                 self.writer.writerow([
-                    f"{timestamp:.3f}",
+                    f"{timestamp:.6f}",
                     frame_num,
                     joint_name,
-                    f"{lm.x:.4f}",
-                    f"{lm.y:.4f}",
-                    f"{lm.z:.4f}",
-                    f"{lm.visibility:.3f}"
+                    f"{lm.x:.6f}",
+                    f"{lm.y:.6f}",
+                    f"{lm.z:.6f}",
+                    f"{lm.visibility:.6f}",
                 ])
-    
+
+        # Optional but good for long recordings
+        self.file.flush()
+
+    # ------------------------------------------------------------------
+
     def close(self):
-        """Close the CSV file"""
+        """Close CSV safely"""
         if self.file:
             self.file.close()
             print(f"[LOGGER] Saved keypoints: {self.filepath}")

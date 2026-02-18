@@ -175,7 +175,7 @@ class PunchAngleAnalyzer:
             })
         
         # Instructions
-        cv2.putText(display, "Click on the fighter to track (Mayweather)", 
+        cv2.putText(display, "Click on the fighter to track", 
                    (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2)
         cv2.putText(display, "Press 'q' to quit", 
                    (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1)
