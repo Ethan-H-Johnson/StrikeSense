@@ -145,5 +145,15 @@ MediaPipe provides world coordinates with origin at hip center:
 - Current focus is on keypoint extraction for analytics
 - MediaPipe chosen over YOLOv8/MMPose for 3D support
 
+## Roadmap
+
+- [x] MediaPipe pose extraction + keypoint CSV export
+- [x] Rule-based Jab/Cross detection
+- [ ] ML strike classifier (Jab, Cross, Hook, Uppercut) — LSTM/1D CNN
+- [ ] Biomechanical form scorer (per-limb quality scoring)
+- [ ] LLM coaching feedback pipeline (Claude API)
+- [ ] Text-to-speech output
+- [ ] iPhone port via CoreML + MediaPipe iOS SDK
+
 ## License
 - MIT
