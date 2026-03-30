@@ -151,7 +151,7 @@ MediaPipe provides world coordinates with origin at hip center:
 - [x] Rule-based Jab/Cross detection
 - [ ] ML strike classifier (Jab, Cross, Hook, Uppercut) — LSTM/1D CNN
 - [ ] Biomechanical form scorer (per-limb quality scoring)
-- [ ] LLM coaching feedback pipeline (Claude API)
+- [ ] LLM coaching feedback pipeline (API TBD)
 - [ ] Text-to-speech output
 - [ ] iPhone port via CoreML + MediaPipe iOS SDK
 
